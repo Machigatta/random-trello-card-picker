@@ -1,0 +1,37 @@
+<main role="main">
+    <section class="jumbotron text-center jumbotron-fluid bg-dark text-light">
+        <div class="container">
+            <h1 class="jumbotron-heading">Random Trello-Card-Picker</h1>
+            <p class="lead text-muted">Pick random cards out of a Trello-Board or Trello-Column.</p>
+        </div>
+    </section>
+</main>
+<div class="container">
+    <h2>Random Trello-Card from a Board</h2>
+    {{#if this.applicationController.userObj.isLoggedIn}}
+        <div class="alert alert-success" role="alert">
+            Authentificated as "{{this.applicationController.userObj.userName}}"
+        </div>
+    {{else}}
+        <div class="alert alert-danger" role="alert">
+            Authentification is missing.
+        </div>
+    {{/if}}
+    
+    <form>
+        <div class="form-group">
+            <label for="board-list">Boards:</label>
+            <select class="form-control" id="board-list" readonly>
+
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="columns-list">Possible Columns</label>
+            <select multiple class="form-control" id="columns-list" readonly>
+
+            </select>
+        </div>
+        <button type="button" class="btn btn-dark btn-block mb-2" disabled>Pick a random Card</button>
+    </form>
+    {{outlet}}
+</div>
