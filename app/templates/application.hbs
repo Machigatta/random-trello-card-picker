@@ -22,15 +22,22 @@
                     {{/link-to}}
                 </li>
             </ul>
-            <form class="form-inline my-2 my-lg-0">
+            <form>
+                {{#if this.userObj.isLoggedIn}}
+                    <span class="navbar-text">
+                        <img src={{this.userObj.avatarUrl}} alt=""> {{this.userObj.userName}}
+                    </span>
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="button"
+                    onclick={{action "logout"}}>
+                    Revoke Access
+                    </button>
+                {{/if}}
+                {{#unless this.userObj.isLoggedIn}}
                 <button class="btn btn-outline-success my-2 my-sm-0" type="button" disabled={{this.userObj.isLoggedIn}}
-                    onclick={{action 'authentificateWithTrello'}}>
-                    {{#if this.userObj.isLoggedIn}}
-                    Authentificated as "{{this.userObj.userName}}"
-                    {{else}}
-                    Authentificate with Trello
-                    {{/if}}
+                    onclick={{action "login"}}>
+                        {{this.userObj.authState}}
                 </button>
+                {{/unless}}
             </form>
         </div>
     </nav>
