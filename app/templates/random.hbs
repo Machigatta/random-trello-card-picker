@@ -1,56 +1,97 @@
-<main role="main">
-    <section class="jumbotron text-center jumbotron-fluid bg-dark text-light">
-        <div class="container">
-            <h1 class="jumbotron-heading">Random Trello-Card-Picker</h1>
-            <p class="lead text-muted">Pick random cards out of a Trello-Board or Trello-Column.</p>
-        </div>
-    </section>
-</main>
 <div class="container">
-    <h2>Random Trello-Card from a Board</h2>
-    {{#if this.applicationController.userObj.isLoggedIn}}
-        <div class="alert alert-success" role="alert">
-            Authentificated as "{{this.applicationController.userObj.userName}}"
-        </div>
-    {{else}}
+    {{#unless this.applicationController.userObj.isLoggedIn}}
         <div class="alert alert-danger" role="alert">
             Authentification is missing.
         </div>
-    {{/if}}
-
-    {{#if this.applicationController.trelloObj.todoCard}}
-        <hr>
-        <h2>Your Card:</h2>
-        <div class="card">
-            <div class="card-header"><a href={{this.applicationController.trelloObj.todoCard.shortUrl}}><h3>{{this.applicationController.trelloObj.todoCard.name}}</h3></a></div>
-            <div class="card-body">{{{expand-line-breaks this.applicationController.trelloObj.todoCard.desc}}}</div>
-            <div class="card-footer">
-                {{#each this.applicationController.trelloObj.todoCard.labels as |label|}}
-                    <span class="badge badge-default">{{label.name}}</span>
-                {{/each}}
-            </div>
-        </div>
-        <hr>
-    {{/if}}
-
+    {{/unless}}
+    <h1>RCD</h1>
+    <div>
+        <blockquote class="blockquote">
+            <footer class="blockquote-footer">
+                {{#if this.applicationController.filter.cards.length}}
+                    {{this.applicationController.filter.cards.length}} cards found.
+                {{else}}
+                No cards found
+                {{/if}}
+            </footer>
+        </blockquote>
+    </div>
     <form>
+        <h5>Boards <small>{{this.applicationController.filter.boardId}}</small></h5>
         <div class="form-group">
-            <label for="board-list">Boards:</label>
-            <select class="form-control" id="board-list" onchange={{action "getColumns" value="target.value"}}>
+            
+            <select class="form-control" id="board-list" onchange={{action "onBoardChange" value="target.value"}}>
+                <option value="">---</option>
                 {{#each this.applicationController.trelloObj.boards as |board|}}
                     <option value={{board.id}}>{{board.name}}</option>
                 {{/each}}
             </select>
         </div>
-        <div class="form-group">
-            <label for="columns-list">Possible Columns</label>
-            <select class="form-control" id="columns-list" onchange={{action "bindFList" value="target.value"}}>
-                {{#each this.applicationController.trelloObj.columns as |list|}}
-                    <option value={{list.id}}>{{list.name}}</option>
-                {{/each}}
-            </select>
+        <div class="row">
+            <div class="col-sm">
+                <h5>Possible Columns <small>{{this.applicationController.filter.columnId}}</small></h5>
+                <div class="form-group">
+                    {{#if this.applicationController.trelloObj.columns.length}}
+                        <select class="form-control" id="columns-list" onchange={{action "onChangeColumn" value="target.value"}}>
+                            <option value="">---</option>
+                            {{#each this.applicationController.trelloObj.columns as |list|}}
+                            <option value={{list.id}}>{{list.name}}</option>
+                            {{/each}}
+                        </select>
+                    {{else}}
+                        <p><i>No Columns</i></p>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="col-sm">
+                <h5>Labels:</h5>
+                <div class="form-group label-list-div">
+                    {{#unless this.applicationController.trelloObj.labels.length}}
+                        <p><i>No Labels</i></p>
+                    {{/unless}}
+                    <div class="row">
+                    {{#each this.applicationController.trelloObj.labels as |label|}}
+                        
+                            <div class="col-sm-6">
+                                <div class="input-group input-group-{{label.color}} mb-3">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text">
+                                            <input type="checkbox" checked="checked" value="{{label.id}}" onchange={{action 'updateLabelSelection' value="target"}}>
+                                        </div>
+                                    </div>
+                                    <input type="text" class="form-control" disabled="disabled" value={{label.name}}>
+                                </div>
+                            </div>
+                    {{/each}}
+                    </div>
+                </div>
+            </div>
         </div>
-        <button type="button" class="btn btn-dark btn-block mb-2" onclick={{action "pickCard" value="columns-list.value"}}>Pick a random Card</button>
+        <button type="button" class="btn btn-dark btn-block mb-2" disabled={{this.applicationController.invalidForm}} onclick={{action "pickCard" value="columns-list.value"}}>Pick a random Card</button>
     </form>
+    {{#if this.applicationController.trelloObj.todoCard}}
+    <hr>
+    <div class="row justify-content-md-center">
+        <div class="col-md-auto">
+            <div class="card">
+                <div class="card-header">
+                    <a href={{this.applicationController.trelloObj.todoCard.shortUrl}}>
+                        <h3>{{this.applicationController.trelloObj.todoCard.name}}</h3>
+                    </a>
+                </div>
+                {{#if this.applicationController.trelloObj.todoCard.labels.desc}}
+                    <div class="card-body">{{{expand-line-breaks this.applicationController.trelloObj.todoCard.desc}}}</div>
+                {{/if}}
+                {{#if this.applicationController.trelloObj.todoCard.labels.length}}
+                    <div class="card-footer">
+                        {{#each this.applicationController.trelloObj.todoCard.labels as |label|}}
+                        <span class="badge badge-default badge-own-{{label.color}}">{{label.name}}</span>
+                        {{/each}}
+                    </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+    {{/if}}
     {{outlet}}
 </div>

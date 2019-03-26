@@ -14,20 +14,23 @@ export default Controller.extend({
         }
         if (typeof Trello != 'undefined'){
             if(Trello.authorized()){
-                this.applicationController.retrieveBoards();
+                this.applicationController.getAllBoards();
             }
             
         }
     },
     actions:{
-        getColumns(val){
-            this.applicationController.getColumns(val);
+        onBoardChange(val){
+            this.applicationController.onBoardChange(val);
         },
         pickCard(val) {
             this.applicationController.pickCard(val);
         },
-        bindFList(val){
-            this.applicationController.bindFList(val);
+        onChangeColumn(val){
+            this.applicationController.onChangeColumn(val);
+        },
+        updateLabelSelection(val){
+            this.applicationController.updateLabelSelection(val);
         }
     }
     
