@@ -56,7 +56,7 @@
                                 <div class="input-group input-group-{{label.color}} mb-3">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text">
-                                            <input type="checkbox" checked="checked" value="{{label.id}}" onchange={{action 'updateLabelSelection' value="target"}}>
+                                            <input type="checkbox" checked="checked" value="label.id" onchange={{action "updateLabelSelection" value="target"}}>
                                         </div>
                                     </div>
                                     <input type="text" class="form-control" disabled="disabled" value={{label.name}}>
