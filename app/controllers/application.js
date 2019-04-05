@@ -73,7 +73,6 @@ export default Controller.extend({
         this.set("trelloObj.todoCard", this.filter.cards[Math.floor(Math.random() * this.filter.cards.length)]);
     },
     filterCardObj() {
-        
         this.set("filter.cards", []);
         this.trelloObj.cards.forEach(cElement => {
             if(cElement.labels.length > 0){
@@ -81,7 +80,9 @@ export default Controller.extend({
                     this.filter.labels.forEach(fElement => {
                         if (lElement.id == fElement.id) {
                             //remove
-                            this.filter.cards.push(cElement);
+                            this.filter.cards.pushIfNotExist(cElement, function (e) {
+                                return e.id === cElement.id;
+                            });
                         }
                     });
                 });
