@@ -35,7 +35,7 @@ export default Controller.extend({
     },
     filter: {
         boardId: null,
-        columnId: null,
+        columns: [],
         labels: [],
         cards: []
     },
@@ -74,21 +74,27 @@ export default Controller.extend({
     },
     filterCardObj() {
         this.set("filter.cards", []);
-        this.trelloObj.cards.forEach(cElement => {
-            if(cElement.labels.length > 0){
-                cElement.labels.forEach(lElement => {
-                    this.filter.labels.forEach(fElement => {
-                        if (lElement.id == fElement.id) {
-                            //remove
-                            this.filter.cards.pushIfNotExist(cElement, function (e) {
-                                return e.id === cElement.id;
+        this.trelloObj.cards.forEach(cardElement => {
+                this.filter.columns.forEach(columnElement => {
+                    if (cardElement.labels.length > 0) {
+                        cardElement.labels.forEach(cardLabelElement => {
+                            this.filter.labels.forEach(filterLabelElement => {
+                                if (cardLabelElement.id == filterLabelElement.id && columnElement.id == cardElement.idList) {
+                                    //remove
+                                    this.filter.cards.pushIfNotExist(cardElement, function (e) {
+                                        return e.id === cardElement.id;
+                                    });
+                                } 
+                            });
+                        });
+                    } else {
+                        if (columnElement.id == cardElement.idList){
+                            this.filter.cards.pushIfNotExist(cardElement, function (e) {
+                                return e.id === cardElement.id;
                             });
                         }
-                    });
+                    }
                 });
-            }else{
-                this.filter.cards.push(cElement);
-            }
             
         });
     },
@@ -110,29 +116,27 @@ export default Controller.extend({
         
         this.filterCardObj();
     },
-    onChangeColumn(val) {
-        if (val == "") {
-            this.set("filter.columnId", null);
-            this.getAllCardsFromBoard(this.filter.boardId);
-        } else {
-            this.set("filter.columnId", val);
-            this.set("requestRunning", true);
-            const promiseCard = Trello.get("/lists/" + this.filter.columnId + "/cards");
-            promiseCard.then((res) => {
-                this.set("requestRunning", false);
-                this.set("trelloObj.cards", res);
-                this.set("filter.cards", res.slice(0));
-            });
-        }
+    updateColumnSelection(el) {
+        this._super(...arguments);
+        this.trelloObj.columns.forEach(element => {
+            if (element.id == el.value) {
+                if (el.checked) {
+                    this.get("filter.columns").pushObject(element)
+                } else {
+                    this.get("filter.columns").removeObject(element);
+                }
+            }
+        });
         this.filterCardObj();
     },
     updateLabelSelection(el){
+        this._super(...arguments);
         this.trelloObj.labels.forEach(element => {
             if (element.id == el.value){                
                 if (el.checked){
-                    this.filter.labels.push(element)
+                    this.get("filter.labels").pushObject(element);
                 }else{
-                    this.filter.labels.splice(this.filter.labels.indexOf(element), 1);
+                    this.get("filter.labels").removeObject(element);
                 }
             }
         });
@@ -145,6 +149,7 @@ export default Controller.extend({
         colPromiseList.then((res) => {
             this.set("requestRunning", false);
             this.set("trelloObj.columns", res);
+            this.set("filter.columns", res.slice(0));
         });  
     },
     getAllCardsFromBoard(val) {
@@ -181,7 +186,7 @@ export default Controller.extend({
         this.set("trelloObj.todoCard", null);
         this.set("filter", {
             boardId: null,
-            columnId: null,
+            columns: [],
             labels: [],
             cards: []
         });

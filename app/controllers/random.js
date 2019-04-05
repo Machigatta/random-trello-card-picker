@@ -26,8 +26,8 @@ export default Controller.extend({
         pickCard(val) {
             this.applicationController.pickCard(val);
         },
-        onChangeColumn(val){
-            this.applicationController.onChangeColumn(val);
+        updateColumnSelection(val){
+            this.applicationController.updateColumnSelection(val);
         },
         updateLabelSelection(val){
             this.applicationController.updateLabelSelection(val);

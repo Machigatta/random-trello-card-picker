@@ -14,11 +14,12 @@
                     {{else}}
                     No cards found
                     {{/if}}
-                {{else}}
+                {{/unless}}
+                {{#if this.applicationController.requestRunning}}
                     <div class="spinner-border spinner-border-sm" role="status">
                         <span class="sr-only">Loading...</span>
                     </div>
-                {{/unless}}
+                {{/if}}
             </footer>
         </blockquote>
     </div>
@@ -35,18 +36,26 @@
         </div>
         <div class="row">
             <div class="col-sm">
-                <h5>Possible Columns <small>{{this.applicationController.filter.columnId}}</small></h5>
+                <h5>Possible Columns</h5>
                 <div class="form-group">
-                    {{#if this.applicationController.trelloObj.columns.length}}
-                        <select class="form-control" id="columns-list" onchange={{action "onChangeColumn" value="target.value"}}>
-                            <option value="">---</option>
-                            {{#each this.applicationController.trelloObj.columns as |list|}}
-                            <option value={{list.id}}>{{list.name}}</option>
-                            {{/each}}
-                        </select>
-                    {{else}}
+                    {{#unless this.applicationController.trelloObj.columns.length}}
                         <p><i>No Columns</i></p>
-                    {{/if}}
+                    {{/unless}}
+                    <div class="row">
+                        {{#each this.applicationController.trelloObj.columns as |list|}}
+                    
+                        <div class="col-sm-6">
+                            <div class="input-group input-group-default mb-3">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <input type="checkbox" checked="checked" value={{list.id}} onchange={{action "updateColumnSelection" value="target"}}>
+                                    </div>
+                                </div>
+                                <input type="text" class="form-control" disabled="disabled" value={{list.name}}>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
                 </div>
             </div>
             <div class="col-sm">
@@ -85,7 +94,7 @@
                         <h3>{{this.applicationController.trelloObj.todoCard.name}}</h3>
                     </a>
                 </div>
-                {{#if this.applicationController.trelloObj.todoCard.labels.desc}}
+                {{#if this.applicationController.trelloObj.todoCard.desc}}
                     <div class="card-body">{{{expand-line-breaks this.applicationController.trelloObj.todoCard.desc}}}</div>
                 {{/if}}
                 {{#if this.applicationController.trelloObj.todoCard.labels.length}}
