@@ -18,6 +18,7 @@ export default Controller.extend({
         }
     },
     invalidForm: true,
+    requestRunning: false,
     fList: null,
     userObj: {
         isLoggedIn: false,
@@ -72,16 +73,22 @@ export default Controller.extend({
         this.set("trelloObj.todoCard", this.filter.cards[Math.floor(Math.random() * this.filter.cards.length)]);
     },
     filterCardObj() {
+        
         this.set("filter.cards", []);
         this.trelloObj.cards.forEach(cElement => {
-            cElement.labels.forEach(lElement => {
-                this.filter.labels.forEach(fElement => {
-                    if (lElement.id == fElement.id) {
-                        //remove
-                        this.filter.cards.push(cElement);
-                    }
+            if(cElement.labels.length > 0){
+                cElement.labels.forEach(lElement => {
+                    this.filter.labels.forEach(fElement => {
+                        if (lElement.id == fElement.id) {
+                            //remove
+                            this.filter.cards.push(cElement);
+                        }
+                    });
                 });
-            });
+            }else{
+                this.filter.cards.push(cElement);
+            }
+            
         });
     },
     //EVENT-HANDLER
@@ -108,17 +115,19 @@ export default Controller.extend({
             this.getAllCardsFromBoard(this.filter.boardId);
         } else {
             this.set("filter.columnId", val);
+            this.set("requestRunning", true);
             const promiseCard = Trello.get("/lists/" + this.filter.columnId + "/cards");
             promiseCard.then((res) => {
+                this.set("requestRunning", false);
                 this.set("trelloObj.cards", res);
                 this.set("filter.cards", res.slice(0));
             });
         }
         this.filterCardObj();
     },
-    updateLabelSelection(el){        
+    updateLabelSelection(el){
         this.trelloObj.labels.forEach(element => {
-            if (element.id == el.value){
+            if (element.id == el.value){                
                 if (el.checked){
                     this.filter.labels.push(element)
                 }else{
@@ -130,29 +139,37 @@ export default Controller.extend({
     },
     //DATA-HANDLER
     getAllListsFromBoard(val){
+        this.set("requestRunning", true);
         const colPromiseList = Trello.get("/boards/" + val + "/lists");
         colPromiseList.then((res) => {
+            this.set("requestRunning", false);
             this.set("trelloObj.columns", res);
         });  
     },
-    getAllCardsFromBoard(val){
+    getAllCardsFromBoard(val) {
+        this.set("requestRunning", true);
         const cardPromiseList = Trello.get("/boards/" + val + "/cards");
         cardPromiseList.then((res) => {
+            this.set("requestRunning", false);
             this.set("trelloObj.cards", res);
             this.set("filter.cards", res.slice(0));
         });   
     },
     getAllLabelsFromList(val){
+        this.set("requestRunning", true);
         const labelPromiseList = Trello.get("/boards/" + val + "/labels");
         labelPromiseList.then((res) => {
+            this.set("requestRunning", false);
             this.set("trelloObj.labels", res);
             this.set("filter.labels", res.slice(0));
         });
     },
     getAllBoards() {
         this._super(...arguments);
+        this.set("requestRunning", true);
         const promise = Trello.get("/members/me/boards");
         promise.then((res) => {
+            this.set("requestRunning", false);
             this.set("trelloObj.boards", res);
         });
     },
