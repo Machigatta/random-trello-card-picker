@@ -1,7 +1,7 @@
 <div class="container">
     {{#unless this.applicationController.userObj.isLoggedIn}}
         <div class="alert alert-danger" role="alert">
-            Authentification is missing.
+            {{ this.applicationController.errormsg }}
         </div>
     {{/unless}}
     <h1>RCD</h1>

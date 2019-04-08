@@ -19,6 +19,7 @@ export default Controller.extend({
     },
     invalidForm: true,
     requestRunning: false,
+    errormsg: "Authentification is missing.",
     fList: null,
     userObj: {
         isLoggedIn: false,
@@ -56,8 +57,20 @@ export default Controller.extend({
             this.set("userObj.isLoggedIn", true);
             this.set("userObj.authState", "Authentificated");
         });
+        promise.catch((error) => {
+            switch (error.status) {
+                case 401:
+                    this.logout();
+                    this.set("errormsg", "Invalid Token");
+                    break;
+            
+                default:
+                    break;
+            }
+        })
     },
     logout(){
+        this.set("errormsg", "Authentification is missing.");
         Trello.deauthorize();
         this.resetMeta();
         this.set("token", null);
